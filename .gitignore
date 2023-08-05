@@ -3,3 +3,6 @@
 
 # vscode config files
 .vscode/*
+
+# pycache
+*.pyc
