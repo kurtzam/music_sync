@@ -370,6 +370,17 @@ files = [
 ]
 
 [[package]]
+name = "pkce"
+version = "1.0.3"
+description = "PKCE Pyhton generator."
+optional = false
+python-versions = ">=3"
+files = [
+    {file = "pkce-1.0.3-py3-none-any.whl", hash = "sha256:55927e24c7d403b2491ebe182b95d9dcb1807643243d47e3879fbda5aad4471d"},
+    {file = "pkce-1.0.3.tar.gz", hash = "sha256:9775fd76d8a743d39b87df38af1cd04a58c9b5a5242d5a6350ef343d06814ab6"},
+]
+
+[[package]]
 name = "platformdirs"
 version = "3.8.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -607,4 +618,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "80c36ba5c7d853ae0608de4b7a1d97552286c03665834747356bb8dd8d1aebf7"
+content-hash = "6b1ed47680951cbbd9c665e651927dc4bc10bee5d67bba1db1e269e5b1ac57f6"
