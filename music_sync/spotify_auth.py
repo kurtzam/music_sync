@@ -1,7 +1,5 @@
 import string
 import secrets
-import hashlib
-from base64 import urlsafe_b64encode
 from urllib.parse import urlparse, urlunparse, urlencode
 
 import requests
@@ -32,18 +30,6 @@ class SpotifyAuth:
         letters = string.ascii_lowercase + string.ascii_uppercase + string.digits
         random_string: str = "".join(secrets.choice(letters) for _ in range(size))
         return random_string
-
-    def _prepare_code_verifier_and_challenge(self):
-        code_verifier_str = self._generate_random_string(128)
-        code_verifier_digest = hashlib.sha256(code_verifier_str.encode("utf-8")).digest()
-        code_verifier_b64 = urlsafe_b64encode(code_verifier_digest)
-        code_challenge = code_verifier_b64.decode("utf-8")[:-1]
-        return {
-            "code_verifier_str": code_verifier_str,
-            "code_verifier_digest": code_verifier_digest,
-            "code_verifier_b64": code_verifier_b64,
-            "code_challenge": code_challenge,
-        }
 
     def generate_auth_request(self) -> SpotifyUserAuthRequest:
         state = self._generate_random_string(16)
