@@ -11,8 +11,8 @@ from music_sync.models import SpotifyUserAuthRequest, SpotifyToken
 class SpotifyAuth:
     def __init__(
         self,
-        spotify_client_id: str,
-        redirect_uri: str
+        spotify_client_id: str = "",
+        redirect_uri: str = "",
     ) -> None:
         self.spotify_api_base = "https://api.spotify.com"
         self.spotify_client_id = spotify_client_id
@@ -34,6 +34,11 @@ class SpotifyAuth:
     def generate_auth_request(self) -> SpotifyUserAuthRequest:
         state = self._generate_random_string(16)
         code_verifier, code_challenge = pkce.generate_pkce_pair(code_verifier_length=128)
+
+        if not self.spotify_client_id:
+            raise self.MissingValues("Missing Spotify client ID")
+        elif not self.redirect_uri:
+            raise self.MissingValues("Missing redirect URI")
 
         request_args = {
             "response_type": "code",
@@ -57,6 +62,11 @@ class SpotifyAuth:
         )
 
     def request_auth_token(self, code: str, code_verifier: str):
+        if not self.spotify_client_id:
+            raise self.MissingValues("Missing Spotify client ID")
+        elif not self.redirect_uri:
+            raise self.MissingValues("Missing redirect URI")
+
         body_params = {
             "grant_type": "authorization_code",
             "code": code,
@@ -68,6 +78,23 @@ class SpotifyAuth:
             url="https://accounts.spotify.com/api/token",
             data=body_params,
         )
+        resp.raise_for_status()
 
         self.spotify_token = SpotifyToken.model_validate_json(resp.text)
         return self.spotify_token
+
+    def get_current_user_profile(self, access_token: str):
+        endpoint = "/v1/me"
+        resp = requests.get(
+            url=f"{self.spotify_api_base}{endpoint}",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        resp.raise_for_status()
+        resp_json = resp.json()
+        return {
+            "display_name": resp_json.get("display_name"),
+            "images": resp_json.get("images")
+        }
+
+    class MissingValues(Exception):
+        pass
