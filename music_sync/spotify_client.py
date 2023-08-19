@@ -8,7 +8,7 @@ import pkce
 from music_sync.models import SpotifyUserAuthRequest, SpotifyToken
 
 
-class SpotifyAuth:
+class SpotifyClient:
     def __init__(
         self,
         spotify_client_id: str = "",
