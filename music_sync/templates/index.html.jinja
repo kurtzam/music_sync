@@ -4,6 +4,13 @@
     <title>My Webpage</title>
 </head>
 <body>
-    <a href='{{spotify_auth_url}}'>Spotify login</a>
+    <div id="spotify_instructions">
+        <ol>
+            <li>Follow the link below to login to Spotify</li>
+            <li>When prompted, grant this application access to Spotify</li>
+            <li>Review the list of playlists to import into Apple Music</li>
+        </ol>
+        <a href='{{spotify_auth_url}}'>Login to Spotify</a>
+    </div>
 </body>
 </html>

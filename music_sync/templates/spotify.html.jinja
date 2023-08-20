@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Webpage</title>
+</head>
+<body>
+    <h1>Spotify</h1>
+    <h2>{{session.spotify_profile.display_name}}</h2>
+    <img src="{{session.spotify_profile.images[0].url}}">
+    <h2>Playlists</h2>
+    <ul>
+        <li>Liked Songs (Library)</li>
+        {% for playlist in playlists %}
+            <li>{{ playlist.name }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
