@@ -1,11 +1,18 @@
 import string
 import secrets
 from urllib.parse import urlparse, urlunparse, urlencode
+from uuid import uuid4
+import json
 
 import requests
 import pkce
 
-from music_sync.models import SpotifyUserAuthRequest, SpotifyToken
+from music_sync.models import (
+    SpotifyUserAuthRequest,
+    SpotifyToken,
+    SpotifyUserProfile,
+    SpotifyUserPlaylist,
+)
 
 
 class SpotifyClient:
@@ -61,7 +68,7 @@ class SpotifyClient:
             code_verifier=code_verifier,
         )
 
-    def request_auth_token(self, code: str, code_verifier: str):
+    def request_auth_token(self, code: str, code_verifier: str) -> SpotifyToken:
         if not self.spotify_client_id:
             raise self.MissingValues("Missing Spotify client ID")
         elif not self.redirect_uri:
@@ -83,17 +90,56 @@ class SpotifyClient:
         self.spotify_token = SpotifyToken.model_validate_json(resp.text)
         return self.spotify_token
 
-    def get_current_user_profile(self, access_token: str):
+    def get_current_user_profile(self, access_token: str) -> SpotifyUserProfile:
         endpoint = "/v1/me"
         resp = requests.get(
             url=f"{self.spotify_api_base}{endpoint}",
             headers={"Authorization": f"Bearer {access_token}"}
         )
         resp.raise_for_status()
-        resp_json = resp.json()
+        profile = SpotifyUserProfile.model_validate_json(resp.text)
+        return profile
+
+    def get_current_user_playlists(
+            self,
+            access_token: str,
+            session_id: str = str(uuid4())
+    ) -> dict[str, list[SpotifyUserPlaylist]]:
+        endpoint = "/v1/me/playlists"
+        limit = 20
+        offset = 0
+        total = 0
+        counter = 0
+        playlists: list[SpotifyUserPlaylist] = []
+        while True:
+            resp = requests.get(
+                url=f"{self.spotify_api_base}{endpoint}",
+                headers={"Authorization": f"Bearer {access_token}"},
+                params={
+                    "limit": limit,
+                    "offset": offset
+                }
+            )
+            resp_json = resp.json()
+            total = resp_json.get("total")
+            resp_playlists = resp_json.get("items")
+            counter += len(resp_playlists)
+            for p in resp_playlists:
+                playlists.append(SpotifyUserPlaylist.model_validate(p))
+            if total <= limit:
+                break
+            else:
+                if counter == total:
+                    break
+                else:
+                    offset = counter
+        playlist_data_file = f"data/{session_id}-playlists.json"
+        playlists_json = [p.model_dump() for p in playlists]
+        with open(playlist_data_file, "w") as playlist_fh:
+            json.dump(playlists_json, playlist_fh, indent=4)
         return {
-            "display_name": resp_json.get("display_name"),
-            "images": resp_json.get("images")
+            "playlists_data_file": playlist_data_file,
+            "playlists": playlists
         }
 
     class MissingValues(Exception):
