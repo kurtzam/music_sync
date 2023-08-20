@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -27,3 +28,29 @@ class SpotifyToken(BaseModel):
     expires_in: int
     refresh_token: str
     scope: str
+
+
+class SpotifyImage(BaseModel):
+    url: str
+    height: Optional[int]
+    width: Optional[int]
+
+
+class SpotifyUserProfile(BaseModel):
+    id: str
+    display_name: str
+    images: list[SpotifyImage]
+
+
+class SpotifyPlaylistTracks(BaseModel):
+    href: str
+    total: int
+
+
+class SpotifyUserPlaylist(BaseModel):
+    description: str
+    id: str
+    images: list[SpotifyImage]
+    name: str
+    tracks: SpotifyPlaylistTracks
+    uri: str
