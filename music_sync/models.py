@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 
 class WebAppConfig(BaseModel):
@@ -47,8 +47,13 @@ class SpotifyPlaylistTracks(BaseModel):
     total: int
 
 
+class SpotifyExternalUrl(BaseModel):
+    spotify: HttpUrl
+
+
 class SpotifyUserPlaylist(BaseModel):
     description: str
+    external_urls: SpotifyExternalUrl
     id: str
     images: list[SpotifyImage]
     name: str
