@@ -136,7 +136,11 @@ class SpotifyClient:
         playlist_data_file = f"data/{session_id}-playlists.json"
         playlists_json = [p.model_dump() for p in playlists]
         with open(playlist_data_file, "w") as playlist_fh:
-            json.dump(playlists_json, playlist_fh, indent=4)
+            json.dump(
+                playlists_json,
+                playlist_fh,
+                indent=4,
+                default=str)
         return {
             "playlists_data_file": playlist_data_file,
             "playlists": playlists
