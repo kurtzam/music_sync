@@ -14,9 +14,8 @@
         <input type="checkbox" id="library" name="Library" value="library">
         <label for="library">Liked Songs (Library)</label><br>
         {% for playlist in playlists %}
-        <input type="checkbox" id="{{ playlist.id }}" name="{{ playlist.name }}" value="{{ playlist.id }}">
-        <label for="{{ playlist.id }}"><a href="{{ playlist.external_urls.spotify }}" target="_blank">{{ playlist.name
-                }}</a></label><br>
+        <input type="checkbox" id="{{ playlist.id }}" name="playlist_id" value="{{ playlist.id }}">
+        <label for="{{ playlist.id }}"><a href="{{ playlist.external_urls.spotify }}" target="_blank">{{ playlist.name }}</a></label><br>
         {% endfor %}
         <input type="submit" value="Submit">
     </form>

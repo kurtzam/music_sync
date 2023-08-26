@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 from pydantic import BaseModel, HttpUrl
 
 
@@ -42,20 +42,50 @@ class SpotifyUserProfile(BaseModel):
     images: list[SpotifyImage]
 
 
-class SpotifyPlaylistTracks(BaseModel):
+class SpotifyPlaylistTrackSummary(BaseModel):
     href: str
     total: int
 
 
-class SpotifyExternalUrl(BaseModel):
+class SpotifyExternalUrls(BaseModel):
     spotify: HttpUrl
 
 
 class SpotifyUserPlaylist(BaseModel):
     description: str
-    external_urls: SpotifyExternalUrl
+    external_urls: SpotifyExternalUrls
     id: str
     images: list[SpotifyImage]
     name: str
-    tracks: SpotifyPlaylistTracks
+    tracks: SpotifyPlaylistTrackSummary
     uri: str
+
+
+class SpotifyExternalIds(BaseModel):
+    isrc: str
+
+
+class SpotifyAlbum(BaseModel):
+    album_type: str
+    name: str
+
+
+class SpotifyArtist(BaseModel):
+    name: str
+
+
+class SpotifyTrack(BaseModel):
+    external_ids: SpotifyExternalIds
+    external_urls: SpotifyExternalUrls
+    id: str
+    name: str
+    artists: list[SpotifyArtist]
+    album: SpotifyAlbum
+    track: bool
+    type: Literal["track"]
+    uri: str
+
+
+class SpotifyUserPlaylistTracks(BaseModel):
+    playlist_id: str
+    tracks: list[SpotifyTrack]

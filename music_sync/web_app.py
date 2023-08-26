@@ -53,11 +53,11 @@ def spotify_auth():
     session["spotify_access_token"] = spotify_token_resp.access_token
     # NB maybe keep other things, like the refresh token and timeout
 
-    return redirect(url_for('spotify'))
+    return redirect(url_for('spotify_playlists'))
 
 
-@app.route("/spotify")
-def spotify():
+@app.route("/spotify_playlists")
+def spotify_playlists():
     if not (access_token := session.get("spotify_access_token")):
         return redirect(url_for("spotify_auth"))
     sc = SpotifyClient()
@@ -69,6 +69,20 @@ def spotify():
         "spotify.html.jinja",
         playlists=playlist_data["playlists"],
     )
+
+
+@app.route("/spotify_playlist_tracks", methods=["POST"])
+def spotify_playlist_tracks():
+    if not (access_token := session.get("spotify_access_token")):
+        return redirect(url_for("spotify_auth"))
+    selected_playlist_ids = request.form.getlist("playlist_id")
+    sc = SpotifyClient()
+    playlists_tracks = sc.get_tracks_for_multi_playlists(
+        access_token=access_token,
+        playlist_ids=selected_playlist_ids,
+        session_id=session["session_id"]
+    )
+    return "<p>Done</p>"
 
 
 def set_session_model(session_key: str, session_value: BaseModel):
