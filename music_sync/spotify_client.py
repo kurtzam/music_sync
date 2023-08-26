@@ -131,7 +131,6 @@ class SpotifyClient:
         profile = SpotifyUserProfile.model_validate_json(resp.text)
         return profile
 
-    # TODO use pagination method
     def get_current_user_playlists(
         self,
         access_token: str,
@@ -139,32 +138,11 @@ class SpotifyClient:
     ) -> dict[str, list[SpotifyUserPlaylist]]:
         endpoint = "/v1/me/playlists"
         limit = 20
-        offset = 0
-        total = 0
-        counter = 0
         playlists: list[SpotifyUserPlaylist] = []
-        while True:
-            resp = requests.get(
-                url=f"{self.spotify_api_base}{endpoint}",
-                headers={"Authorization": f"Bearer {access_token}"},
-                params={
-                    "limit": limit,
-                    "offset": offset
-                }
-            )
-            resp_json = resp.json()
-            total = resp_json.get("total")
-            resp_playlists = resp_json.get("items")
-            counter += len(resp_playlists)
-            for p in resp_playlists:
-                playlists.append(SpotifyUserPlaylist.model_validate(p))
-            if total <= limit:
-                break
-            else:
-                if counter == total:
-                    break
-                else:
-                    offset = counter
+        resp_playlists = self._paginate_get_request(access_token=access_token, endpoint=endpoint, limit=limit)
+        all_resp_playlists = []
+        [all_resp_playlists.extend(l) for l in resp_playlists]
+        [playlists.append(SpotifyUserPlaylist.model_validate(p)) for p in all_resp_playlists]
         playlist_data_file = f"data/{session_id}-playlists.json"
         playlists_json = [p.model_dump() for p in playlists]
         with open(playlist_data_file, "w") as playlist_fh:
